@@ -10,6 +10,6 @@ FROM debian:bullseye
 
 WORKDIR /app
 
-COPY --from=builder /usr/app/main /app/main
+COPY --from=builder /usr/app/teknologi-umum-bot /app/teknologi-umum-bot
 
-CMD [ "./main" ]
+CMD [ "./teknologi-umum-bot" ]
