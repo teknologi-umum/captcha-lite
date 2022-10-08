@@ -4,12 +4,12 @@ WORKDIR /usr/app
 
 COPY . .
 
-RUN go build .
+RUN go build -o captcha-lite .
 
 FROM debian:bullseye
 
 WORKDIR /app
 
-COPY --from=builder /usr/app/teknologi-umum-bot /app/teknologi-umum-bot
+COPY --from=builder /usr/app/captcha-lite /app/captcha-lite
 
-CMD [ "./teknologi-umum-bot" ]
+CMD [ "./captcha-lite" ]
