@@ -34,13 +34,13 @@ import (
 	// Database and cache
 	"github.com/allegro/bigcache/v3"
 	"github.com/rollbar/rollbar-go"
-	"github.com/rs/zerolog"
 
 	// Others third party stuff
 	"github.com/getsentry/sentry-go"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/pkg/errors"
 	tb "gopkg.in/tucnak/telebot.v2"
+	"github.com/rs/zerolog"
 )
 
 // This init function checks if there's any configuration
