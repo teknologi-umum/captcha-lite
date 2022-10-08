@@ -15,6 +15,7 @@
 package main
 
 import (
+	"io"
 	"log"
 	"os"
 	"os/signal"
@@ -28,10 +29,12 @@ import (
 	"teknologi-umum-bot/logger/noop"
 	rollbarlogger "teknologi-umum-bot/logger/rollbar"
 	sentrylogger "teknologi-umum-bot/logger/sentry"
+	zerologlogger "teknologi-umum-bot/logger/zerolog"
 
 	// Database and cache
 	"github.com/allegro/bigcache/v3"
 	"github.com/rollbar/rollbar-go"
+	"github.com/rs/zerolog"
 
 	// Others third party stuff
 	"github.com/getsentry/sentry-go"
@@ -119,6 +122,18 @@ func main() {
 				os.Getenv("ROLLBAR_SERVERROOT"),
 			),
 		)
+	case "zerolog":
+		var out io.Writer
+		switch os.Getenv("ZEROLOG_OUTPUT") {
+		case "STDOUT":
+			out = os.Stdout
+		case "STDERR":
+		default:
+			out = os.Stderr
+		}
+
+		logger := zerolog.New(out)
+		loggerClient = zerologlogger.New(logger)
 	default:
 		loggerClient = noop.New()
 	}
