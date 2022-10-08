@@ -127,7 +127,7 @@ func main() {
 		switch os.Getenv("ZEROLOG_OUTPUT") {
 		case "STDOUT":
 			out = os.Stdout
-		case "STDERR":
+		case "STDERR": fallthrough
 		default:
 			out = os.Stderr
 		}
