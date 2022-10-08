@@ -15,6 +15,7 @@
 package main
 
 import (
+	"io"
 	"log"
 	"os"
 	"os/signal"
@@ -28,6 +29,7 @@ import (
 	"teknologi-umum-bot/logger/noop"
 	rollbarlogger "teknologi-umum-bot/logger/rollbar"
 	sentrylogger "teknologi-umum-bot/logger/sentry"
+	zerologlogger "teknologi-umum-bot/logger/zerolog"
 
 	// Database and cache
 	"github.com/allegro/bigcache/v3"
@@ -38,6 +40,7 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/pkg/errors"
 	tb "gopkg.in/tucnak/telebot.v2"
+	"github.com/rs/zerolog"
 )
 
 // This init function checks if there's any configuration
@@ -119,6 +122,19 @@ func main() {
 				os.Getenv("ROLLBAR_SERVERROOT"),
 			),
 		)
+	case "zerolog":
+		var out io.Writer
+		switch os.Getenv("ZEROLOG_OUTPUT") {
+		case "STDOUT":
+			out = os.Stdout
+		case "STDERR":
+			fallthrough
+		default:
+			out = os.Stderr
+		}
+
+		logger := zerolog.New(out)
+		loggerClient = zerologlogger.New(logger)
 	default:
 		loggerClient = noop.New()
 	}
