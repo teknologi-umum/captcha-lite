@@ -1,0 +1,13 @@
+[Unit]
+Description=A very lightweight version of Teknologi Umum's captcha
+After=network.target
+Wants=network-online.target
+
+[Service]
+Restart=always
+Type=simple
+ExecStart=/usr/local/bin/captcha-lite
+Environment='ENVIRONMENT=development' 'BOT_TOKEN=CHANGEME' 'LANGUAGE=EN' 'LOG_PROVIDER=noop'
+
+[Install]
+WantedBy=multi-user.target
