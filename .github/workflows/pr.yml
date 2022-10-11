@@ -4,43 +4,16 @@ on:
   pull_request:
     branches:
       - "*"
-  push:
-    branches:
-      - '*'
 
 jobs:
   ci:
     name: CI
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    container: golang:1.18
-    services:
-      db:
-        image: postgres:14-alpine
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_PASSWORD: password
-          POSTGRES_USER: postgres
-          POSTGRES_DB: captcha
-      cache:
-        image: redis:6-alpine
-        ports:
-          - 6379:6379
-      mongo:
-        image: mongo:5-focal
-        ports:
-          - 27017:27017
-        env:
-          MONGO_INITDB_ROOT_USERNAME: root
-          MONGO_INITDB_ROOT_PASSWORD: password
-          MONGO_INITDB_DATABASE: captcha
+    container: golang:bullseye
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Installling dependencies
-        run: go mod download
+        uses: actions/checkout@v3
 
       - name: Build
         run: go build .
@@ -59,4 +32,4 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v1
 
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v3
