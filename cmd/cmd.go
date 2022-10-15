@@ -6,7 +6,7 @@ import (
 	"teknologi-umum-bot/logger"
 
 	"github.com/allegro/bigcache/v3"
-	tb "gopkg.in/tucnak/telebot.v2"
+	tb "gopkg.in/telebot.v3"
 )
 
 // Dependency contains the dependency injection struct
@@ -45,26 +45,30 @@ func New(deps Dependency) *Dependency {
 }
 
 // OnTextHandler handle any incoming text from the group
-func (d *Dependency) OnTextHandler(m *tb.Message) {
-	d.captcha.WaitForAnswer(m)
+func (d *Dependency) OnTextHandler(c tb.Context) error {
+	d.captcha.WaitForAnswer(c.Message())
+	return nil
 }
 
 // OnUserJoinHandler handle any incoming user join,
 // whether they were invited by someone (meaning they are
 // added by someone else into the group), or they join
 // the group all by themselves.
-func (d *Dependency) OnUserJoinHandler(m *tb.Message) {
-	d.captcha.CaptchaUserJoin(m)
+func (d *Dependency) OnUserJoinHandler(c tb.Context) error {
+	d.captcha.CaptchaUserJoin(c.Message())
+	return nil
 }
 
 // OnNonTextHandler meant to handle anything else
 // than an incoming text message.
-func (d *Dependency) OnNonTextHandler(m *tb.Message) {
-	d.captcha.NonTextListener(m)
+func (d *Dependency) OnNonTextHandler(c tb.Context) error {
+	d.captcha.NonTextListener(c.Message())
+	return nil
 }
 
 // OnUserLeftHandler handles during an event in which
 // a user left the group.
-func (d *Dependency) OnUserLeftHandler(m *tb.Message) {
-	d.captcha.CaptchaUserLeave(m)
+func (d *Dependency) OnUserLeftHandler(c tb.Context) error {
+	d.captcha.CaptchaUserLeave(c.Message())
+	return nil
 }

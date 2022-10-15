@@ -1,7 +1,7 @@
 package logger
 
 import (
-	tb "gopkg.in/tucnak/telebot.v2"
+	tb "gopkg.in/telebot.v3"
 )
 
 type Logger interface {

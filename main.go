@@ -39,8 +39,8 @@ import (
 	"github.com/getsentry/sentry-go"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/pkg/errors"
-	tb "gopkg.in/tucnak/telebot.v2"
 	"github.com/rs/zerolog"
+	tb "gopkg.in/telebot.v3"
 )
 
 // This init function checks if there's any configuration
@@ -143,7 +143,7 @@ func main() {
 	b, err := tb.NewBot(tb.Settings{
 		Token:  os.Getenv("BOT_TOKEN"),
 		Poller: &tb.LongPoller{Timeout: 10 * time.Second},
-		Reporter: func(err error) {
+		OnError: func(err error, ctx tb.Context) {
 			if strings.Contains(err.Error(), "Conflict: terminated by other getUpdates request") {
 				// This error means the bot is currently being deployed
 				return
@@ -181,14 +181,12 @@ func main() {
 	})
 
 	// This is basically just for health check.
-	b.Handle("/start", func(m *tb.Message) {
-		if m.FromGroup() {
-			_, err := b.Send(m.Chat, "ok")
-			if err != nil {
-				loggerClient.HandleBotError(err, b, m)
-				return
-			}
+	b.Handle("/start", func(c tb.Context) error {
+		_, err := c.Bot().Send(c.Message().Chat, "ok")
+		if err != nil {
+			loggerClient.HandleBotError(err, b, c.Message())
 		}
+		return nil
 	})
 
 	// Captcha handlers

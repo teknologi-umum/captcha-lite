@@ -6,7 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 	rb "github.com/rollbar/rollbar-go"
-	tb "gopkg.in/tucnak/telebot.v2"
+	tb "gopkg.in/telebot.v3"
 )
 
 type Config struct {
