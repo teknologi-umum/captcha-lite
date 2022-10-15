@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"teknologi-umum-bot/utils"
 
-	tb "gopkg.in/tucnak/telebot.v2"
+	tb "gopkg.in/telebot.v3"
 )
 
 // CaptchaUserLeave handles the event when a user left the group.
@@ -29,7 +29,7 @@ func (d *Dependencies) CaptchaUserLeave(m *tb.Message) {
 
 	// We need to check if the user is in the captcha:users cache
 	// or not.
-	check, err := userExists(d.Memory, strconv.Itoa(m.Sender.ID))
+	check, err := userExists(d.Memory, strconv.FormatInt(m.Sender.ID, 10))
 	if err != nil {
 		d.Log.HandleBotError(err, d.Bot, m)
 		return
@@ -41,7 +41,7 @@ func (d *Dependencies) CaptchaUserLeave(m *tb.Message) {
 
 	// OK, they exist in the cache. Now we've got to delete
 	// all the message that we've sent before.
-	data, err := d.Memory.Get(strconv.Itoa(m.Sender.ID))
+	data, err := d.Memory.Get(strconv.FormatInt(m.Sender.ID, 10))
 	if err != nil {
 		d.Log.HandleBotError(err, d.Bot, m)
 		return
@@ -54,7 +54,7 @@ func (d *Dependencies) CaptchaUserLeave(m *tb.Message) {
 		return
 	}
 
-	err = d.removeUserFromCache(strconv.Itoa(m.Sender.ID))
+	err = d.removeUserFromCache(strconv.FormatInt(m.Sender.ID, 10))
 	if err != nil {
 		d.Log.HandleBotError(err, d.Bot, m)
 		return

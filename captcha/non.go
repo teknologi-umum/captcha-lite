@@ -8,7 +8,7 @@ import (
 	"teknologi-umum-bot/utils"
 	"time"
 
-	tb "gopkg.in/tucnak/telebot.v2"
+	tb "gopkg.in/telebot.v3"
 )
 
 // NonTextListener is the handler for every incoming payload that
@@ -17,7 +17,7 @@ func (d *Dependencies) NonTextListener(m *tb.Message) {
 	// Check if the message author is in the captcha:users list or not
 	// If not, return
 	// If yes, check if the answer is correct or not
-	exists, err := userExists(d.Memory, strconv.Itoa(m.Sender.ID))
+	exists, err := userExists(d.Memory, strconv.FormatInt(m.Sender.ID, 10))
 	if err != nil {
 		d.Log.HandleBotError(err, d.Bot, m)
 		return
@@ -33,7 +33,7 @@ func (d *Dependencies) NonTextListener(m *tb.Message) {
 	//
 	// Get the answer and all the data surrounding captcha from
 	// this specific user ID from the cache.
-	data, err := d.Memory.Get(strconv.Itoa(m.Sender.ID))
+	data, err := d.Memory.Get(strconv.FormatInt(m.Sender.ID, 10))
 	if err != nil {
 		d.Log.HandleBotError(err, d.Bot, m)
 		return
@@ -49,7 +49,7 @@ func (d *Dependencies) NonTextListener(m *tb.Message) {
 	// Check if the answer is a media
 	remainingTime := time.Until(captcha.Expiry)
 	message := strings.NewReplacer(
-		"{{user}}", "<a href=\"tg://user?id="+strconv.Itoa(m.Sender.ID)+"\">"+
+		"{{user}}", "<a href=\"tg://user?id="+strconv.FormatInt(m.Sender.ID, 10)+"\">"+
 			sanitizeInput(m.Sender.FirstName)+
 			utils.ShouldAddSpace(m.Sender)+
 			sanitizeInput(m.Sender.LastName)+

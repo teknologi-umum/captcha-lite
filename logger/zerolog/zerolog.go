@@ -4,24 +4,24 @@ import (
 	"fmt"
 
 	"github.com/rs/zerolog"
-	tb "gopkg.in/tucnak/telebot.v2"
+	tb "gopkg.in/telebot.v3"
 )
 
 type sender struct {
-	Id int
-	Name string
+	Id       int64
+	Name     string
 	Username string
 }
 
 func (s sender) MarshalZerologObject(e *zerolog.Event) {
-	e.Int("id", s.Id).
+	e.Int64("id", s.Id).
 		Str("name", s.Name).
 		Str("username", s.Username)
 }
 
 type message struct {
-	Id int
-	Text string
+	Id       int
+	Text     string
 	Unixtime int64
 }
 
@@ -65,7 +65,7 @@ func (c *Config) HandleBotError(e error, bot *tb.Bot, m *tb.Message) {
 
 	s := sender{
 		Id:       m.Sender.ID,
-		Name:    fmt.Sprintf("%s %s", m.Sender.FirstName, m.Sender.LastName),
+		Name:     fmt.Sprintf("%s %s", m.Sender.FirstName, m.Sender.LastName),
 		Username: m.Sender.Username,
 	}
 

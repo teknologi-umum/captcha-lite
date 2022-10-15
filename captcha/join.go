@@ -10,7 +10,7 @@ import (
 	"teknologi-umum-bot/utils"
 	"time"
 
-	tb "gopkg.in/tucnak/telebot.v2"
+	tb "gopkg.in/telebot.v3"
 )
 
 // Captcha struct keep all the data needed for the captcha
@@ -75,7 +75,7 @@ func (d *Dependencies) CaptchaUserJoin(m *tb.Message) {
 	// Replacing the template from CaptchaQuestion
 	question := strings.NewReplacer(
 		"{{captcha}}", captcha,
-		"{{user}}", "<a href=\"tg://user?id="+strconv.Itoa(m.Sender.ID)+"\">"+
+		"{{user}}", "<a href=\"tg://user?id="+strconv.FormatInt(m.Sender.ID, 10)+"\">"+
 			sanitizeInput(m.Sender.FirstName)+utils.ShouldAddSpace(m.Sender)+sanitizeInput(m.Sender.LastName)+
 			"</a>",
 	).Replace(d.Locale[locale.MessageJoin])
@@ -131,13 +131,13 @@ SENDMSG_RETRY:
 	}
 
 	// Yes, the cache key is their User ID in string format.
-	err = d.Memory.Set(strconv.Itoa(m.Sender.ID), captchaData)
+	err = d.Memory.Set(strconv.FormatInt(m.Sender.ID, 10), captchaData)
 	if err != nil {
 		d.Log.HandleBotError(err, d.Bot, m)
 		return
 	}
 
-	err = d.Memory.Append("captcha:users", []byte(";"+strconv.Itoa(m.Sender.ID)))
+	err = d.Memory.Append("captcha:users", []byte(";"+strconv.FormatInt(m.Sender.ID, 10)))
 	if err != nil {
 		d.Log.HandleBotError(err, d.Bot, m)
 		return

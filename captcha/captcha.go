@@ -5,7 +5,7 @@ import (
 	"teknologi-umum-bot/logger"
 
 	"github.com/allegro/bigcache/v3"
-	tb "gopkg.in/tucnak/telebot.v2"
+	tb "gopkg.in/telebot.v3"
 )
 
 // Dependencies contains the dependency injection struct for

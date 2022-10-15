@@ -6,7 +6,7 @@ import (
 	"teknologi-umum-bot/locale"
 	"teknologi-umum-bot/utils"
 
-	tb "gopkg.in/tucnak/telebot.v2"
+	tb "gopkg.in/telebot.v3"
 )
 
 // sendWelcomeMessage literally does what it's written.
@@ -15,7 +15,7 @@ func (d *Dependencies) sendWelcomeMessage(m *tb.Message) error {
 		m.Chat,
 		strings.NewReplacer(
 			"{{user}}",
-			"<a href=\"tg://user?id="+strconv.Itoa(m.Sender.ID)+"\">"+
+			"<a href=\"tg://user?id="+strconv.FormatInt(m.Sender.ID, 10)+"\">"+
 				sanitizeInput(m.Sender.FirstName)+utils.ShouldAddSpace(m.Sender)+sanitizeInput(m.Sender.LastName)+
 				"</a>",
 			"{{group}}", m.Chat.FirstName,
