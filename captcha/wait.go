@@ -1,11 +1,11 @@
 package captcha
 
 import (
+	"captcha-lite/utils"
 	"encoding/json"
 	"strconv"
 	"strings"
 	"sync"
-	"teknologi-umum-bot/utils"
 	"time"
 
 	"github.com/allegro/bigcache/v3"

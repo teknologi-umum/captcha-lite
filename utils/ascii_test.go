@@ -1,8 +1,8 @@
 package utils_test
 
 import (
+	"captcha-lite/utils"
 	"strings"
-	"teknologi-umum-bot/utils"
 	"testing"
 )
 
