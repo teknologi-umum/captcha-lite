@@ -24,12 +24,12 @@ import (
 	"time"
 
 	// Internals
-	"teknologi-umum-bot/cmd"
-	"teknologi-umum-bot/logger"
-	"teknologi-umum-bot/logger/noop"
-	rollbarlogger "teknologi-umum-bot/logger/rollbar"
-	sentrylogger "teknologi-umum-bot/logger/sentry"
-	zerologlogger "teknologi-umum-bot/logger/zerolog"
+	"captcha-lite/cmd"
+	"captcha-lite/logger"
+	"captcha-lite/logger/noop"
+	rollbarlogger "captcha-lite/logger/rollbar"
+	sentrylogger "captcha-lite/logger/sentry"
+	zerologlogger "captcha-lite/logger/zerolog"
 
 	// Database and cache
 	"github.com/allegro/bigcache/v3"

@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"teknologi-umum-bot/captcha"
-	"teknologi-umum-bot/locale"
-	"teknologi-umum-bot/logger"
+	"captcha-lite/captcha"
+	"captcha-lite/locale"
+	"captcha-lite/logger"
 
 	"github.com/allegro/bigcache/v3"
 	tb "gopkg.in/telebot.v3"

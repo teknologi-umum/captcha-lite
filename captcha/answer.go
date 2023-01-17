@@ -1,10 +1,10 @@
 package captcha
 
 import (
+	"captcha-lite/locale"
 	"encoding/json"
 	"strconv"
 	"strings"
-	"teknologi-umum-bot/locale"
 	"time"
 
 	"github.com/pkg/errors"

@@ -1,9 +1,9 @@
 package captcha
 
 import (
+	"captcha-lite/utils"
 	"encoding/json"
 	"strconv"
-	"teknologi-umum-bot/utils"
 
 	tb "gopkg.in/telebot.v3"
 )
