@@ -15,6 +15,28 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     container: golang:bullseye
+    postgres:
+      image: postgres:15-bullseye
+      env:
+        POSTGRES_PASSWORD: password
+        POSTGRES_USER: captcha
+        POSTGRES_DB: captcha
+      options: >-
+        --health-cmd "pg_isready -U captcha -d captcha"
+        --health-interval 15s
+        --health-timeout 10s
+        --health-retries 5
+    mysql:
+      image: mysql:8
+      env:
+        MYSQL_USER: captcha
+        MYSQL_PASSWORD: password
+        MYSQL_DATABASE: captcha
+      options: >-
+        --health-cmd "mysqladmin ping -h localhost -u captcha --password=password"
+        --health-interval 10s
+        --health-timeout 5s
+        --health-retries 10
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

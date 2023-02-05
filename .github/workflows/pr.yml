@@ -11,6 +11,32 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     container: golang:bullseye
+    services:
+      postgres:
+        image: postgres:15-bullseye
+        env:
+          POSTGRES_PASSWORD: password
+          POSTGRES_USER: captcha
+          POSTGRES_DB: captcha
+        options: >-
+          --health-cmd "pg_isready -U captcha -d captcha"
+          --health-interval 15s
+          --health-timeout 10s
+          --health-retries 5
+          --health-start-period 60s
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_USER: captcha
+          MYSQL_PASSWORD: password
+          MYSQL_DATABASE: captcha
+          MYSQL_ROOT_PASSWORD: password
+        options: >-
+          --health-cmd "mysqladmin ping -h localhost -u captcha --password=password"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+          --health-start-period 60s
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -31,6 +57,8 @@ jobs:
       - name: Run test & coverage
         run: go test -v -coverprofile=coverage.out -covermode=atomic ./...
         env:
+          POSTGRES_URL: postgres://captcha:password@postgres:5432/captcha?sslmode=disable
+          MYSQL_URL: captcha:password@tcp(mysql:3306)/captcha?parseTime=true
           ENVIRONMENT: development
           TZ: UTC
 
