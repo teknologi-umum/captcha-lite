@@ -191,7 +191,7 @@ func (m *mysqlDatastore) CreateNewEntry(ctx context.Context, groupID int64) erro
 			under_attack
 			(group_id, is_under_attack, expires_at, notification_message_id, updated_at)
 		VALUES
-			(?, ?, ?, ?)
+			(?, ?, ?, ?, ?)
 		ON DUPLICATE KEY
 		UPDATE
 		    group_id = group_id`,
