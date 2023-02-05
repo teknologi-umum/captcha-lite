@@ -16,6 +16,8 @@ jobs:
     timeout-minutes: 10
     postgres:
       image: postgres:15-bullseye
+      ports:
+        - 5432:5432
       env:
         POSTGRES_PASSWORD: password
         POSTGRES_USER: captcha
@@ -27,6 +29,8 @@ jobs:
         --health-retries 5
     mysql:
       image: mysql:8
+      ports:
+        - 3306:3306
       env:
         MYSQL_USER: captcha
         MYSQL_PASSWORD: password
@@ -60,6 +64,8 @@ jobs:
       - name: Run test & coverage
         run: go test -v -coverprofile=coverage.out -covermode=atomic ./...
         env:
+          POSTGRES_URL: postgres://captcha:password@localhost:5432/captcha?sslmode=disable
+          MYSQL_URL: captcha:password@tcp(localhost:3306)/captcha?parseTime=true
           ENVIRONMENT: development
           TZ: UTC
 
