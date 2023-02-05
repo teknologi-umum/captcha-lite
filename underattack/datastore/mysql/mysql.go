@@ -197,7 +197,7 @@ func (m *mysqlDatastore) CreateNewEntry(ctx context.Context, groupID int64) erro
 		    group_id = group_id`,
 		groupID,
 		false,
-		time.Time{},
+		time.Date(1000, 1, 1, 0, 0, 0, 0, time.UTC),
 		0,
 		time.Now(),
 	)
