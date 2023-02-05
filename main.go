@@ -15,6 +15,9 @@
 package main
 
 import (
+	"context"
+	"database/sql"
+	"flag"
 	"io"
 	"log"
 	"os"
@@ -30,9 +33,15 @@ import (
 	rollbarlogger "captcha-lite/logger/rollbar"
 	sentrylogger "captcha-lite/logger/sentry"
 	zerologlogger "captcha-lite/logger/zerolog"
+	"captcha-lite/underattack"
+	"captcha-lite/underattack/datastore/memory"
+	"captcha-lite/underattack/datastore/mysql"
+	"captcha-lite/underattack/datastore/postgres"
 
 	// Database and cache
 	"github.com/allegro/bigcache/v3"
+	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 	"github.com/rollbar/rollbar-go"
 
 	// Others third party stuff
@@ -67,8 +76,11 @@ func init() {
 }
 
 func main() {
+	// Feature flags
+	experimentalUnderAttack := flag.Bool("experimental-underattack", false, "Enable the experimental under attack module")
+
 	// Setup in memory cache
-	cache, err := bigcache.NewBigCache(bigcache.Config{
+	cache, err := bigcache.New(context.Background(), bigcache.Config{
 		Shards:             1024,
 		LifeWindow:         time.Minute * 5,
 		CleanWindow:        time.Minute * 1,
@@ -123,7 +135,7 @@ func main() {
 			),
 		)
 	case "zerolog":
-		var out io.Writer
+		var out io.WriteCloser
 		switch os.Getenv("ZEROLOG_OUTPUT") {
 		case "STDOUT":
 			out = os.Stdout
@@ -137,6 +149,72 @@ func main() {
 		loggerClient = zerologlogger.New(logger)
 	default:
 		loggerClient = noop.New()
+	}
+
+	var underAttackModule *underattack.Dependency = nil
+	if *experimentalUnderAttack {
+		underAttackDatastoreProvider, ok := os.LookupEnv("UNDER_ATTACK_DATASTORE_PROVIDER")
+		if !ok {
+			underAttackDatastoreProvider = "memory"
+		}
+
+		underAttackDatastoreDSN, ok := os.LookupEnv("UNDER_ATTACK_DATASTORE_DSN")
+		if !ok {
+			underAttackDatastoreDSN = ""
+		}
+
+		var underAttackDatastore underattack.Datastore = nil
+
+		switch strings.ToLower(underAttackDatastoreProvider) {
+		case "pgsql":
+			fallthrough
+		case "postgresql":
+			fallthrough
+		case "postgres":
+			if underAttackDatastoreDSN == "" {
+				log.Fatalf("Empty UNDER_ATTACK_DATASTORE_DSN for provider: %s", underAttackDatastoreProvider)
+			}
+
+			db, err := sql.Open("postgres", underAttackDatastoreDSN)
+			if err != nil {
+				log.Fatalf("Creating connection to PostgreSQL: %s", err.Error())
+			}
+
+			underAttackDatastore, err = postgres.NewPostgresDatastore(db, loggerClient)
+			if err != nil {
+				log.Fatalf("Creating NewPostgresDatastore: %s", err.Error())
+			}
+		case "mysql":
+			if underAttackDatastoreDSN == "" {
+				log.Fatalf("Empty UNDER_ATTACK_DATASTORE_DSN for provider: %s", underAttackDatastoreProvider)
+			}
+
+			db, err := sql.Open("mysql", underAttackDatastoreDSN)
+			if err != nil {
+				log.Fatalf("Creating connection to PostgreSQL: %s", err.Error())
+			}
+
+			underAttackDatastore, err = mysql.NewMySQLDatastore(db, loggerClient)
+			if err != nil {
+				log.Fatalf("Creating NewPostgresDatastore: %s", err.Error())
+			}
+		case "memory":
+			db, err := bigcache.New(context.Background(), bigcache.DefaultConfig(time.Hour*24))
+			if err != nil {
+				log.Fatalf("Creating in memory store: %s", err.Error())
+			}
+
+			underAttackDatastore, err = memory.NewInMemoryDatastore(db, loggerClient)
+			if err != nil {
+				log.Fatalf("Creating NewInMemoryDatastore: %s", err.Error())
+			}
+		default:
+			log.Fatalf("Unknown under attack datastore provider: %s", underAttackDatastoreProvider)
+		}
+
+		underAttackModule = &underattack.Dependency{
+			Datastore: underAttackDatastore,
+		}
 	}
 
 	// Setup Telegram Bot
@@ -174,10 +252,11 @@ func main() {
 	}()
 
 	deps := cmd.New(cmd.Dependency{
-		Memory:   cache,
-		Bot:      b,
-		Logger:   loggerClient,
-		Language: strings.ToLower(language),
+		Memory:      cache,
+		Bot:         b,
+		Logger:      loggerClient,
+		Language:    strings.ToLower(language),
+		UnderAttack: underAttackModule,
 	})
 
 	// This is basically just for health check.
@@ -211,5 +290,13 @@ func main() {
 
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 	<-signalChan
+
 	log.Println("Shutdown signal received, exiting...")
+
+	if underAttackModule != nil {
+		err := underAttackModule.Datastore.Close()
+		if err != nil {
+			log.Printf("Error during closing datastore connection: %s", err.Error())
+		}
+	}
 }
