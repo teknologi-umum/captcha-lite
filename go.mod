@@ -1,6 +1,6 @@
 module captcha-lite
 
-go 1.19
+go 1.20
 
 require (
 	github.com/aldy505/asciitxt v0.0.2
