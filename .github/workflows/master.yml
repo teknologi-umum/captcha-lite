@@ -36,6 +36,7 @@ jobs:
           MYSQL_USER: captcha
           MYSQL_PASSWORD: password
           MYSQL_DATABASE: captcha
+          MYSQL_ROOT_PASSWORD: password
         options: >-
           --health-cmd "mysqladmin ping -h localhost -u captcha --password=password"
           --health-interval 10s
