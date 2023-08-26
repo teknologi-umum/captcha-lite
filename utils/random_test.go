@@ -1,8 +1,9 @@
 package utils_test
 
 import (
-	"captcha-lite/utils"
 	"testing"
+
+	"captcha-lite/utils"
 )
 
 func TestGenerateRandomNumber(t *testing.T) {

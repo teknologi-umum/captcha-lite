@@ -1,9 +1,10 @@
 package utils_test
 
 import (
-	"captcha-lite/utils"
 	"strings"
 	"testing"
+
+	"captcha-lite/utils"
 )
 
 func TestGenerateAscii(t *testing.T) {

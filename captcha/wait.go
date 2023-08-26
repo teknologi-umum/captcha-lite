@@ -1,12 +1,13 @@
 package captcha
 
 import (
-	"captcha-lite/utils"
 	"encoding/json"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
+
+	"captcha-lite/utils"
 
 	"github.com/allegro/bigcache/v3"
 	"github.com/pkg/errors"
