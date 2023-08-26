@@ -44,7 +44,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		log.Fatalf("seeding data: %s", err.Error())
 	}
-	
+
 	exitCode := m.Run()
 
 	setupCancel()

@@ -1,4 +1,4 @@
-FROM golang:1.20-alpine3.17 AS builder
+FROM golang:1.21-alpine3.18 AS builder
 
 WORKDIR /usr/app
 
@@ -6,12 +6,12 @@ COPY . .
 
 RUN go build -o captcha-lite .
 
-FROM alpine:3.17
+FROM alpine:3.18
 
 RUN apk update && apk add --no-cache curl ca-certificates openssl
 
 WORKDIR /app
-
+COPY . .
 COPY --from=builder /usr/app/captcha-lite /app/captcha-lite
 
 CMD [ "./captcha-lite" ]

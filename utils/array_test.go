@@ -1,8 +1,9 @@
 package utils_test
 
 import (
-	"captcha-lite/utils"
 	"testing"
+
+	"captcha-lite/utils"
 )
 
 func TestIsIn(t *testing.T) {

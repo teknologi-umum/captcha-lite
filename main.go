@@ -23,7 +23,6 @@ import (
 	"os"
 	"os/signal"
 	"strings"
-	"syscall"
 	"time"
 
 	// Internals
@@ -112,7 +111,7 @@ func main() {
 		loggerClient = noop.New()
 	case "sentry":
 		// Setup Sentry for error handling.
-		logger, err := sentry.NewClient(sentry.ClientOptions{
+		sentryClient, err := sentry.NewClient(sentry.ClientOptions{
 			Dsn:              os.Getenv("SENTRY_DSN"),
 			AttachStacktrace: true,
 			Debug:            os.Getenv("ENVIRONMENT") == "development",
@@ -121,9 +120,9 @@ func main() {
 		if err != nil {
 			log.Fatal("during initiating a new sentry client:", errors.WithStack(err))
 		}
-		defer logger.Flush(5 * time.Second)
+		defer sentryClient.Flush(5 * time.Second)
 
-		loggerClient = sentrylogger.New(logger)
+		loggerClient = sentrylogger.New(sentryClient)
 	case "rollbar":
 		loggerClient = rollbarlogger.New(
 			rollbar.New(
@@ -145,8 +144,8 @@ func main() {
 			out = os.Stderr
 		}
 
-		logger := zerolog.New(out)
-		loggerClient = zerologlogger.New(logger)
+		zerologLogger := zerolog.New(out)
+		loggerClient = zerologlogger.New(zerologLogger)
 	default:
 		loggerClient = noop.New()
 	}
@@ -281,22 +280,22 @@ func main() {
 	b.Handle(tb.OnUserLeft, deps.OnUserLeftHandler)
 
 	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, os.Interrupt, os.Kill)
 
 	go func() {
-		// Start the bot
-		log.Println("Bot started!")
-		b.Start()
+		<-signalChan
+
+		log.Println("Shutdown signal received, exiting...")
+
+		if underAttackModule != nil {
+			err := underAttackModule.Datastore.Close()
+			if err != nil {
+				log.Printf("Error during closing datastore connection: %s", err.Error())
+			}
+		}
 	}()
 
-	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
-	<-signalChan
-
-	log.Println("Shutdown signal received, exiting...")
-
-	if underAttackModule != nil {
-		err := underAttackModule.Datastore.Close()
-		if err != nil {
-			log.Printf("Error during closing datastore connection: %s", err.Error())
-		}
-	}
+	// Start the bot
+	log.Println("Bot started!")
+	b.Start()
 }

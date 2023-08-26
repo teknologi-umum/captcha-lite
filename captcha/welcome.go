@@ -1,10 +1,11 @@
 package captcha
 
 import (
-	"captcha-lite/locale"
-	"captcha-lite/utils"
 	"strconv"
 	"strings"
+
+	"captcha-lite/locale"
+	"captcha-lite/utils"
 
 	tb "gopkg.in/telebot.v3"
 )
