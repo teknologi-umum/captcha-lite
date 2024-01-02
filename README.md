@@ -1,5 +1,11 @@
 # Very lightweight Telegram captcha bot written in Go
 
+> [!CAUTION]
+> This repository is deprecated in favor of [captcha](https://github.com/teknologi-umum/captcha).
+> It's hard to maintain two separate repositories at once, while both requires intensive security updates.
+> We decided to streamline everything on the upstream captcha repository instead.
+> Please do not use this repository at all cost.
+
 Some captcha bot on Telegram requires you to pay to be used on groups with 1000+ members.
 Some is just so bad, bots can bypass through them.
 
